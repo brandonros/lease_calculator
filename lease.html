@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+	<head>
+	</head>
+
+	<body>
+		<!-- input -->
+		<div>lease start <input type="text" id="lease_start" value="05/10/2014"></div>
+		<div>lease months <input type="text" id="lease_months" value="27"></div>
+		<div>yearly allowance <input type="text" id="yearly_allowance" value="10000"></div>
+		<div>odometer <input type="text" id="odometer" value="16650"></div>
+
+		<!-- calculated -->
+		<hr>
+
+		<div>lease days <input type="text" id="lease_days" disabled></div>
+		<div>lease years <input type="text" id="lease_years" disabled></div>
+
+		<hr>
+
+		<div>daily allowance <input type="text" id="daily_allowance" disabled></div>
+		<div>monthly allowance <input type="text" id="monthly_allowance" disabled></div>
+		<div>total allowance <input type="text" id="total_allowance" disabled></div>
+
+		<hr>
+
+		<div>lease end <input type="text" id="lease_end" disabled></div>
+		
+		<hr>
+
+		<div>today <input type="text" id="today"></div>
+
+		<hr>
+
+		<div>days elapsed <input type="text" id="days_elapsed" disabled></div>
+		<div>months elapsed <input type="text" id="months_elapsed" disabled></div>
+		<div>years elapsed <input type="text" id="years_elapsed" disabled></div>
+
+		<hr>
+
+		<div>days remaining <input type="text" id="days_remaining" disabled></div>
+		<div>months remaining <input type="text" id="months_remaining" disabled></div>
+		<div>years remaining <input type="text" id="years_remaining" disabled></div>
+
+		<hr>
+
+		<div>milage remaining <input type="text" id="miles_remaining" disabled></div>
+
+		<hr>
+
+		<div>daily usage <input type="text" id="daily_usage" disabled></div>
+		<div>monthly usage <input type="text" id="monthly_usage" disabled></div>
+		<div>yearly usage <input type="text" id="yearly_usage" disabled></div>
+
+		<hr>
+
+		<div>daily mileage remaining <input type="text" id="daily_mileage_remaining" disabled></div>
+		<div>monthly mileage remaining <input type="text" id="monthly_mileage_remaining" disabled></div>
+		<div>yearly mileage remaining <input type="text" id="yearly_mileage_remaining" disabled></div>
+
+		<hr>
+
+		<div>days remaining at current usage <input type="text" id="days_remaining_at_current_usage" disabled></div>
+		<div>months remaining at current usage <input type="text" id="months_remaining_at_current_usage" disabled></div>
+
+		<hr>
+
+		<div>daily overage at current usage <input type="text" id="daily_overage" disabled></div>
+		<div>monthly overage at current usage <input type="text" id="monthly_overage" disabled></div>
+		<div>yearly overage at current usage <input type="text" id="yearly_overage" disabled></div>
+		<div>total overage at current usage <input type="text" id="total_overage" disabled></div>
+
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+		<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.3/moment.min.js"></script>
+
+		<script type="text/javascript">
+			function pretty_divide(quotient, divisor) {
+				return (parseFloat(quotient) / parseFloat(divisor)).toFixed(2);
+			}
+
+			function pretty_subtract(a, b) {
+				return (parseFloat(a) - parseFloat(b)).toFixed(2);
+			}
+
+			function pretty_multiply(a, b) {
+				return (parseFloat(a))
+			}
+
+			function redraw() {
+				var days_per_year = 365.242;
+				var days_per_month = days_per_year / 12;
+
+				var lease_start = moment($('#lease_start').val());
+				var lease_months = parseInt($('#lease_months').val());
+				var lease_days = lease_months * days_per_month;
+				var lease_years = pretty_divide(lease_days, days_per_year);
+
+				var lease_end = lease_start.add(lease_days, 'days').format('MM/DD/YYYY');
+
+				$('#lease_days').val(lease_days);
+				$('#lease_years').val(lease_years);
+				$('#lease_end').val(lease_end);
+
+				var yearly_allowance = parseInt($('#yearly_allowance').val());
+				var daily_allowance = pretty_divide(yearly_allowance, days_per_year);
+				var monthly_allowance = pretty_divide(yearly_allowance, days_per_month);
+				var total_allowance = yearly_allowance * lease_years;
+
+				$('#daily_allowance').val(daily_allowance);
+				$('#monthly_allowance').val(monthly_allowance);
+				$('#total_allowance').val(total_allowance);
+
+				var today = $('#today').val();
+
+				var days_elapsed = lease_days - moment(lease_end).diff(moment(today), 'days');
+
+				var months_elapsed = pretty_divide(days_elapsed, days_per_month);
+				var years_elapsed = pretty_divide(days_elapsed, days_per_year);
+
+				$('#days_elapsed').val(days_elapsed);
+				$('#months_elapsed').val(months_elapsed);
+				$('#years_elapsed').val(years_elapsed);
+
+				var days_remaining = moment(lease_end).diff(moment(today), 'days');
+				var months_remaining = pretty_divide(days_remaining, days_per_month);
+				var years_remaining = pretty_divide(days_remaining, days_per_year);
+				
+				$('#days_remaining').val(days_remaining);
+				$('#months_remaining').val(months_remaining);
+				$('#years_remaining').val(years_remaining);
+
+				var miles_remaining = pretty_subtract($('#total_allowance').val(), $('#odometer').val());
+
+				$('#miles_remaining').val(miles_remaining);
+
+				var daily_usage = pretty_divide($('#odometer').val(), $('#days_elapsed').val());
+				var monthly_usage = pretty_divide($('#odometer').val(), $('#months_elapsed').val());
+				var yearly_usage = pretty_divide($('#odometer').val(), $('#years_elapsed').val());
+
+				$('#daily_usage').val(daily_usage);
+				$('#monthly_usage').val(monthly_usage);
+				$('#yearly_usage').val(yearly_usage);
+
+				var daily_mileage_remaining = pretty_divide($('#miles_remaining').val(), $('#days_remaining').val());
+				var monthly_mileage_remaining = pretty_divide($('#miles_remaining').val(), $('#months_remaining').val());
+				var yearly_mileage_remaining = pretty_divide($('#miles_remaining').val(), $('#years_remaining').val());
+
+				$('#daily_mileage_remaining').val(daily_mileage_remaining);
+				$('#monthly_mileage_remaining').val(monthly_mileage_remaining);
+				$('#yearly_mileage_remaining').val(yearly_mileage_remaining);
+
+				var days_remaining_at_current_usage = pretty_divide($('#miles_remaining').val(), $('#daily_usage').val());
+				var months_remaining_at_current_usage = pretty_divide($('#miles_remaining').val(), $('#monthly_usage').val());
+
+				$('#days_remaining_at_current_usage').val(days_remaining_at_current_usage);
+				$('#months_remaining_at_current_usage').val(months_remaining_at_current_usage);
+
+				var daily_overage = pretty_subtract($('#daily_usage').val(), $('#daily_allowance').val());
+				var monthly_overage = pretty_subtract($('#monthly_usage').val(), $('#monthly_allowance').val());
+				var yearly_overage = pretty_subtract($('#yearly_usage').val(), $('#yearly_allowance').val());
+				var total_overage = daily_overage * days_remaining;
+
+				$('#daily_overage').val(daily_overage);
+				$('#monthly_overage').val(monthly_overage);
+				$('#yearly_overage').val(yearly_overage);
+				$('#total_overage').val(total_overage);
+			}
+
+			$(window).on('load', function () {
+				$('input[type="text"]').on('keyup', function () {
+					redraw();
+				});
+
+				/* initially set today, but allow it to be changed to see forecasting */
+				var today = moment().format('MM/DD/YYYY');
+				$('#today').val(today);
+
+				redraw();
+			});
+		</script>
+	</body>
+</html>
